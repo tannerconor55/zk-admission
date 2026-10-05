@@ -1,15 +1,10 @@
 use hdi::prelude::*;
 use zk_admission_protocol::{
     encoding::{
-        encode_capability_identity,
-        encode_delegation_identity,
-        CAPABILITY_DOMAIN,
+        encode_capability_identity, encode_delegation_identity, CAPABILITY_DOMAIN,
         DELEGATION_DOMAIN,
     },
-    AdmissionConfigV1,
-    AdmissionDelegationV1,
-    AdmissionV1,
-    ProtocolError,
+    AdmissionConfigV1, AdmissionDelegationV1, AdmissionV1, ProtocolError,
 };
 
 fn protocol_error(err: ProtocolError) -> WasmError {

@@ -1,0 +1,3 @@
+# The SP1 guest source is frozen: panic locations (file:line) are compiled
+# into the ELF, so reformatting would change the pinned SP1 program vkey.
+disable_all_formatting = true

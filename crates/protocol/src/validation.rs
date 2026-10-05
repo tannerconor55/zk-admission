@@ -211,11 +211,7 @@ mod tests {
         let author = [4u8, 5, 6];
 
         assert_eq!(
-            validate_admission_bindings(
-                &statement,
-                &admission,
-                context(&deployment, &author, 8),
-            ),
+            validate_admission_bindings(&statement, &admission, context(&deployment, &author, 8),),
             Err(ProtocolError::DelegationIdMismatch)
         );
     }
@@ -230,11 +226,7 @@ mod tests {
         let author = [4u8, 5, 6];
 
         assert_eq!(
-            validate_admission_bindings(
-                &statement,
-                &admission,
-                context(&deployment, &author, 8),
-            ),
+            validate_admission_bindings(&statement, &admission, context(&deployment, &author, 8),),
             Err(ProtocolError::CapabilityIdMismatch)
         );
     }
@@ -313,8 +305,7 @@ mod tests {
         let mut admission = admission(&statement);
 
         admission.capability.resource_class = 4;
-        admission.capability.capability_id =
-            crate::hashes::capability_id(&admission.capability);
+        admission.capability.capability_id = crate::hashes::capability_id(&admission.capability);
 
         let deployment = [1u8; 32];
         let author = [4u8, 5, 6];
@@ -331,8 +322,7 @@ mod tests {
         let mut admission = admission(&statement);
 
         admission.capability.resource_class = 64;
-        admission.capability.capability_id =
-            crate::hashes::capability_id(&admission.capability);
+        admission.capability.capability_id = crate::hashes::capability_id(&admission.capability);
 
         let deployment = [1u8; 32];
         let author = [4u8, 5, 6];
@@ -349,8 +339,7 @@ mod tests {
         let mut admission = admission(&statement);
 
         admission.capability.admission_epoch = 201;
-        admission.capability.capability_id =
-            crate::hashes::capability_id(&admission.capability);
+        admission.capability.capability_id = crate::hashes::capability_id(&admission.capability);
 
         let deployment = [1u8; 32];
         let author = [4u8, 5, 6];
@@ -396,8 +385,7 @@ mod tests {
 
         admission.capability.seq_start = 0;
         admission.capability.seq_end_exclusive = 1025;
-        admission.capability.capability_id =
-            crate::hashes::capability_id(&admission.capability);
+        admission.capability.capability_id = crate::hashes::capability_id(&admission.capability);
 
         let deployment = [1u8; 32];
         let author = [4u8, 5, 6];

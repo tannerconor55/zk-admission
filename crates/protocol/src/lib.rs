@@ -22,10 +22,7 @@ pub use statement::{ProverKeyV1, ZkStatementV1};
 pub use types::SignatureV1;
 
 pub use capability::{
-    recompute_capability_id,
-    recompute_delegation_id,
-    verify_capability_id,
-    verify_delegation_id,
+    recompute_capability_id, recompute_delegation_id, verify_capability_id, verify_delegation_id,
 };
 pub use validation::{validate_admission_bindings, AdmissionContextV1};
 

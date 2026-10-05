@@ -1,8 +1,7 @@
 use hdi::prelude::*;
 
 use zk_admission_protocol::{
-    encoding::encode_statement,
-    AdmissionConfigV1, ProtocolError, ZkProofEntryV1,
+    encoding::encode_statement, AdmissionConfigV1, ProtocolError, ZkProofEntryV1,
 };
 
 use sp1_verifier::{Groth16Verifier, GROTH16_VK_BYTES};
@@ -33,10 +32,7 @@ const SP1_GROTH16_PROOF_LEN: usize = 356;
 ///   -> canonical ZkStatementV1
 ///   -> entry.statement
 /// ```
-pub fn verify_sp1_groth16(
-    proof: &ZkProofEntryV1,
-    config: &AdmissionConfigV1,
-) -> ExternResult<()> {
+pub fn verify_sp1_groth16(proof: &ZkProofEntryV1, config: &AdmissionConfigV1) -> ExternResult<()> {
     // V1 accepts only the normal non-TEE SP1 Groth16 encoding.
     //
     // The SDK's TEE form has an additional prefix and is intentionally
@@ -137,7 +133,9 @@ mod tests {
         };
 
         let err = verify_sp1_groth16(&proof, &test_config()).unwrap_err();
-        assert!(err.to_string().contains("SP1 program verifying-key hash mismatch"));
+        assert!(err
+            .to_string()
+            .contains("SP1 program verifying-key hash mismatch"));
 
         statement.program_id = [7; 32];
         let _ = statement;
@@ -198,6 +196,8 @@ mod tests {
         };
 
         let err = verify_sp1_groth16(&proof, &config).unwrap_err();
-        assert!(err.to_string().contains("invalid SP1 Groth16 proof encoding"));
+        assert!(err
+            .to_string()
+            .contains("invalid SP1 Groth16 proof encoding"));
     }
 }

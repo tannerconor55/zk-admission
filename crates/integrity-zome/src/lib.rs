@@ -61,21 +61,20 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
 
     // A Create action that is not our zk_proof_v1 entry is outside
     // the proof-specific validation path.
-    let proof = match activity::proof_entry_from_op(&op, proof_entry_type)
-        .map_err(protocol_error)?
-    {
-        Some(proof) => proof,
-        None => return Ok(ValidateCallbackResult::Valid),
-    };
+    let proof =
+        match activity::proof_entry_from_op(&op, proof_entry_type).map_err(protocol_error)? {
+            Some(proof) => proof,
+            None => return Ok(ValidateCallbackResult::Valid),
+        };
 
     // The DNA hash is the authenticated deployment identity.
     let dna_hash = dna_info()?.hash;
     let deployment_id_bytes = dna_hash.get_raw_32();
-    let deployment_id: &[u8; 32] = deployment_id_bytes
-        .try_into()
-        .map_err(|_| wasm_error!(WasmErrorInner::Guest(
+    let deployment_id: &[u8; 32] = deployment_id_bytes.try_into().map_err(|_| {
+        wasm_error!(WasmErrorInner::Guest(
             "DNA hash must be exactly 32 bytes".into()
-        )))?;
+        ))
+    })?;
 
     // DNA properties are the authenticated trust configuration.
     let config: AdmissionConfigV1 = DnaPropertiesV1::try_from_dna_properties()?.into();
@@ -94,17 +93,10 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
 
     // Branch-local sequence and rate-limit validation.
     let capability = &proof.admission.capability;
-    let window = SequenceWindowV1::new(
-        capability.seq_start,
-        capability.seq_end_exclusive,
-    )
-    .map_err(protocol_error)?;
+    let window = SequenceWindowV1::new(capability.seq_start, capability.seq_end_exclusive)
+        .map_err(protocol_error)?;
 
-    activity::validate_prior_activity_from_chain(
-        candidate,
-        window,
-        proof_entry_type,
-    )?;
+    activity::validate_prior_activity_from_chain(candidate, window, proof_entry_type)?;
 
     // Authenticate the admission delegation against the DNA-rooted key,
     // then authenticate the operational capability against the delegated key.

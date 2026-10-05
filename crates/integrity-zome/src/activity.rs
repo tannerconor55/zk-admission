@@ -1,10 +1,6 @@
 use hdi::prelude::*;
 
-use zk_admission_protocol::{
-    error::ProtocolError,
-    sequence::SequenceWindowV1,
-    ZkProofEntryV1,
-};
+use zk_admission_protocol::{error::ProtocolError, sequence::SequenceWindowV1, ZkProofEntryV1};
 
 /// Configuration identifying the exact V1 proof entry.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -184,11 +180,7 @@ pub fn create_action_from_op<'a>(op: &'a Op) -> Option<&'a Action> {
 mod tests {
     use super::*;
     use zk_admission_protocol::{
-        AdmissionCapabilityV1,
-        AdmissionDelegationV1,
-        AdmissionV1,
-        ProverKeyV1,
-        SignatureV1,
+        AdmissionCapabilityV1, AdmissionDelegationV1, AdmissionV1, ProverKeyV1, SignatureV1,
         ZkStatementV1,
     };
 
