@@ -3,13 +3,15 @@ use ark_crypto_primitives::crh::sha256::constraints::Sha256Gadget;
 use ark_r1cs_std::{prelude::*, uint8::UInt8};
 use ark_relations::r1cs::SynthesisError;
 use std::ops::Not;
+use zk_admission_protocol::encoding::NULLIFIER_DOMAIN;
 
 const HMAC_BLOCK_SIZE: usize = 64;
 const IPAD: u8 = 0x36;
 const OPAD: u8 = 0x5c;
 
-const NULLIFIER_DOMAIN: &[u8] = b"HOLOCHAIN-ZK-NULLIFIER-V1";
-const NULLIFIER_MESSAGE_LEN: usize = 25 + 32 + 32 + 2;
+// The domain separator comes from the protocol crate so the circuit and
+// `zk_admission_protocol::hashes::nullifier` cannot drift apart.
+const NULLIFIER_MESSAGE_LEN: usize = NULLIFIER_DOMAIN.len() + 32 + 32 + 2;
 
 fn xor_byte(a: &UInt8<Fr>, b: u8) -> Result<UInt8<Fr>, SynthesisError> {
     let a_bits = a.to_bits_le()?;

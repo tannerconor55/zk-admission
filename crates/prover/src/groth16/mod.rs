@@ -1,2 +1,2 @@
 pub mod api;
-pub mod nullifier;
+pub use zk_admission_groth16_circuit::nullifier;

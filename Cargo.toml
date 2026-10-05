@@ -7,6 +7,7 @@ members = [
     "crates/sp1-guest",
     "crates/prover",
     "crates/groth16-verifier",
+    "crates/groth16-circuit",
 ]
 
 [workspace.package]
@@ -23,3 +24,28 @@ hdi = "=0.8.0"
 hdk = "=0.7.0"
 holo_hash = "=0.7.0"
 holochain_serialized_bytes = "=0.0.57"
+
+# Unoptimised arkworks makes Groth16 setup/proving in tests take minutes.
+# Optimise only the arithmetic-heavy dependencies in dev/test builds.
+[profile.dev.package.ark-ff]
+opt-level = 3
+[profile.dev.package.ark-ec]
+opt-level = 3
+[profile.dev.package.ark-poly]
+opt-level = 3
+[profile.dev.package.ark-bn254]
+opt-level = 3
+[profile.dev.package.ark-groth16]
+opt-level = 3
+[profile.dev.package.ark-relations]
+opt-level = 3
+[profile.dev.package.ark-r1cs-std]
+opt-level = 3
+[profile.dev.package.ark-crypto-primitives]
+opt-level = 3
+[profile.dev.package.ark-serialize]
+opt-level = 3
+[profile.dev.package.ark-std]
+opt-level = 3
+[profile.dev.package.zk-admission-groth16-circuit]
+opt-level = 3

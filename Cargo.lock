@@ -6290,6 +6290,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "zk-admission-groth16-circuit"
+version = "0.1.0"
+dependencies = [
+ "ark-bn254",
+ "ark-crypto-primitives",
+ "ark-groth16",
+ "ark-r1cs-std",
+ "ark-relations",
+ "ark-serialize",
+ "ark-snark",
+ "ark-std",
+ "zk-admission-groth16-verifier",
+ "zk-admission-protocol",
+]
+
+[[package]]
 name = "zk-admission-groth16-verifier"
 version = "0.1.0"
 dependencies = [
@@ -6341,6 +6357,7 @@ dependencies = [
  "hex",
  "sha2",
  "sp1-sdk",
+ "zk-admission-groth16-circuit",
  "zk-admission-groth16-verifier",
  "zk-admission-protocol",
 ]

@@ -1,0 +1,27 @@
+[package]
+name = "zk-admission-groth16-circuit"
+version.workspace = true
+edition.workspace = true
+
+# Arkworks-only native nullifier circuit, setup and proving.
+#
+# Kept separate from `zk-admission-prover` so that it builds and tests
+# without the SP1 SDK or the SP1 guest ELF, and so that integrity-zome
+# tests can generate real proofs without depending on the prover crate.
+
+[lib]
+name = "zk_admission_groth16_circuit"
+path = "src/lib.rs"
+
+[dependencies]
+zk-admission-protocol = { path = "../protocol" }
+zk-admission-groth16-verifier = { path = "../groth16-verifier" }
+ark-bn254 = "0.5.0"
+ark-groth16 = "0.5.0"
+ark-relations = "0.5.1"
+ark-r1cs-std = "0.5.0"
+# `getrandom` provides OsRng; setup and proving must use OS randomness.
+ark-std = { version = "0.5.0", features = ["std", "getrandom"] }
+ark-snark = "0.5.1"
+ark-serialize = "0.5.0"
+ark-crypto-primitives = { version = "0.5.0", features = ["crh", "r1cs", "std"] }
