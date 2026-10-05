@@ -37,6 +37,10 @@ opt-level = 3
 opt-level = 3
 [profile.dev.package.ark-groth16]
 opt-level = 3
+# Match release: ark-groth16 only debug_asserts witness satisfiability, so a
+# release prover silently emits invalid proofs. Tests rely on producing
+# such cheating proofs to show the verifier rejects them.
+debug-assertions = false
 [profile.dev.package.ark-relations]
 opt-level = 3
 [profile.dev.package.ark-r1cs-std]

@@ -6295,12 +6295,14 @@ version = "0.1.0"
 dependencies = [
  "ark-bn254",
  "ark-crypto-primitives",
+ "ark-ec",
  "ark-groth16",
  "ark-r1cs-std",
  "ark-relations",
  "ark-serialize",
  "ark-snark",
  "ark-std",
+ "holochain_serialized_bytes",
  "zk-admission-groth16-verifier",
  "zk-admission-protocol",
 ]
@@ -6316,6 +6318,7 @@ dependencies = [
  "ark-serialize",
  "ark-snark",
  "sha2",
+ "zk-admission-protocol",
 ]
 
 [[package]]

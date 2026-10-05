@@ -1,11 +1,14 @@
 #![forbid(unsafe_code)]
 
 use ark_bn254::{Bn254, Fr};
-use ark_groth16::{prepare_verifying_key, Groth16, Proof, VerifyingKey};
+use ark_groth16::{prepare_verifying_key, Groth16, PreparedVerifyingKey, Proof, VerifyingKey};
 use ark_relations::r1cs::ToConstraintField;
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use ark_snark::SNARK;
 use sha2::{Digest, Sha256};
+use zk_admission_protocol::{
+    NullifierGroth16ProofV1, ProtocolError, ZkStatementV1, NULLIFIER_GROTH16_PROTOCOL_VERSION,
+};
 
 pub type Groth16Proof = Proof<Bn254>;
 pub type Groth16VerifyingKey = VerifyingKey<Bn254>;
@@ -155,6 +158,89 @@ pub fn verifying_key_fingerprint(verifying_key: &Groth16VerifyingKey) -> Result<
     Ok(verifying_key_bytes_fingerprint(&serialize_verifying_key(
         verifying_key,
     )?))
+}
+
+/// A native nullifier verifying key taken from authenticated deployment
+/// configuration (DNA properties), never from the proof entry.
+pub struct PinnedNullifierVerifyingKey {
+    prepared: PreparedVerifyingKey<Bn254>,
+    fingerprint: [u8; 32],
+}
+
+impl PinnedNullifierVerifyingKey {
+    /// Both arguments must come from the same authenticated configuration.
+    ///
+    /// The fingerprint is checked before decoding so that a configuration
+    /// whose key bytes and fingerprint disagree is rejected outright.
+    pub fn from_config(
+        verifying_key_bytes: &[u8],
+        expected_fingerprint: &[u8; 32],
+    ) -> Result<Self, ProtocolError> {
+        if verifying_key_bytes_fingerprint(verifying_key_bytes) != *expected_fingerprint {
+            return Err(ProtocolError::InvalidNullifierVerifyingKey);
+        }
+
+        let verifying_key = deserialize_verifying_key(verifying_key_bytes)
+            .map_err(|_| ProtocolError::InvalidNullifierVerifyingKey)?;
+
+        if verifying_key.gamma_abc_g1.len() != NULLIFIER_PUBLIC_INPUT_LEN + 1 {
+            return Err(ProtocolError::InvalidNullifierVerifyingKey);
+        }
+
+        Ok(Self {
+            prepared: prepare_verifying_key(&verifying_key),
+            fingerprint: *expected_fingerprint,
+        })
+    }
+
+    pub fn fingerprint(&self) -> &[u8; 32] {
+        &self.fingerprint
+    }
+}
+
+/// The nullifier-circuit public inputs of a statement.
+pub fn statement_public_inputs(statement: &ZkStatementV1) -> NullifierPublicInputs {
+    NullifierPublicInputs {
+        deployment_id: statement.deployment_id,
+        domain: statement.domain,
+        expected_nullifier: statement.nullifier,
+    }
+}
+
+/// Verify a native nullifier proof against a statement and a pinned key.
+///
+/// Establishes only: the prover knew a 32-byte credential secret with
+/// `statement.nullifier == HMAC-SHA256(secret, NULLIFIER_DOMAIN ||
+/// statement.deployment_id || statement.domain || u16_be(1))`.
+///
+/// It does not authenticate `statement.deployment_id`; callers must first
+/// check it against the DNA (`validate_admission_bindings`).
+pub fn verify_statement_nullifier_proof(
+    pinned: &PinnedNullifierVerifyingKey,
+    statement: &ZkStatementV1,
+    proof: &NullifierGroth16ProofV1,
+) -> Result<(), ProtocolError> {
+    // The protocol version is a circuit constant, so it is bound through
+    // the verifying key; the statement must claim that same version.
+    if statement.protocol_version != NULLIFIER_GROTH16_PROTOCOL_VERSION {
+        return Err(ProtocolError::InvalidProtocolVersion);
+    }
+
+    if proof.verifying_key_id != pinned.fingerprint {
+        return Err(ProtocolError::NullifierVerifyingKeyMismatch);
+    }
+
+    let groth16_proof =
+        deserialize_proof(&proof.proof).map_err(|_| ProtocolError::InvalidNullifierProof)?;
+
+    match Groth16::<Bn254>::verify_with_processed_vk(
+        &pinned.prepared,
+        &public_inputs(&statement_public_inputs(statement)),
+        &groth16_proof,
+    ) {
+        Ok(true) => Ok(()),
+        Ok(false) | Err(_) => Err(ProtocolError::NullifierProofVerificationFailed),
+    }
 }
 
 #[cfg(test)]

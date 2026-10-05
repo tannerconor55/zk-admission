@@ -8,6 +8,7 @@ name = "zk_admission_groth16_verifier"
 path = "src/lib.rs"
 
 [dependencies]
+zk-admission-protocol = { path = "../protocol" }
 ark-bn254 = "0.5.0"
 # No default features: the verifier must not pull rayon/std-parallel
 # machinery into the wasm32 integrity zome.
