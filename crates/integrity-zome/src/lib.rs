@@ -8,6 +8,8 @@ use zk_admission_protocol::{
 };
 
 mod activity;
+#[cfg(test)]
+mod binding_tests;
 mod crypto;
 mod native_groth16;
 mod sp1;
