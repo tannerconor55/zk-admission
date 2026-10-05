@@ -1,0 +1,16 @@
+[package]
+name = "zk-admission-protocol"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+name = "zk_admission_protocol"
+path = "src/lib.rs"
+
+[dependencies]
+serde = { workspace = true }
+sha2 = { workspace = true }
+hmac = { workspace = true }
+thiserror = { workspace = true }
+holochain_serialized_bytes = "=0.0.57"

@@ -1,0 +1,7 @@
+[target.wasm32-unknown-unknown]
+rustflags = [
+    "-C",
+    "link-arg=--import-undefined",
+    "--cfg",
+    'getrandom_backend="custom"',
+]

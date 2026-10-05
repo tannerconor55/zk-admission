@@ -1,0 +1,12 @@
+[package]
+name = "zk-admission-sp1-guest"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "zk-admission-sp1-guest"
+path = "src/main.rs"
+
+[dependencies]
+sp1-zkvm = { version = "=6.8.1", default-features = false, features = ["lib"] }
+zk-admission-protocol = { path = "../protocol" }

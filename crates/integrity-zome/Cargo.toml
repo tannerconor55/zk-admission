@@ -1,0 +1,16 @@
+[package]
+name = "zk-admission-integrity-zome"
+version.workspace = true
+edition.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+hdi = { workspace = true }
+holo_hash = { workspace = true, features = ["hashing"] }
+holochain_serialized_bytes = { workspace = true }
+serde = { workspace = true }
+sp1-verifier = { version = "6.8.1", default-features = false }
+hex = "0.4.3"
+zk-admission-protocol = { path = "../protocol" }

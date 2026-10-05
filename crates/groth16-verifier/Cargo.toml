@@ -1,0 +1,15 @@
+[package]
+name = "zk-admission-groth16-verifier"
+version.workspace = true
+edition.workspace = true
+
+[lib]
+name = "zk_admission_groth16_verifier"
+path = "src/lib.rs"
+
+[dependencies]
+ark-bn254 = "0.5.0"
+ark-groth16 = "0.5.0"
+ark-serialize = "0.5.0"
+ark-relations = "0.5.1"
+ark-snark = "0.5.1"
