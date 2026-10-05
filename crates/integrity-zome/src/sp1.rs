@@ -80,6 +80,8 @@ mod tests {
             issuer_root_key: [0; 32],
             issuer_root_key_id: [0; 32],
             sp1_program_vkey_hash: [7; 32],
+            nullifier_groth16_vk: Vec::new(),
+            nullifier_groth16_vk_fingerprint: [0; 32],
         }
     }
 
@@ -130,6 +132,10 @@ mod tests {
                 },
             },
             groth16_proof: vec![0; SP1_GROTH16_PROOF_LEN],
+            nullifier_proof: zk_admission_protocol::NullifierGroth16ProofV1 {
+                verifying_key_id: [0; 32],
+                proof: Vec::new(),
+            },
         };
 
         let err = verify_sp1_groth16(&proof, &test_config()).unwrap_err();
@@ -193,6 +199,10 @@ mod tests {
                 },
             },
             groth16_proof: vec![0; SP1_GROTH16_PROOF_LEN - 1],
+            nullifier_proof: zk_admission_protocol::NullifierGroth16ProofV1 {
+                verifying_key_id: [0; 32],
+                proof: Vec::new(),
+            },
         };
 
         let err = verify_sp1_groth16(&proof, &config).unwrap_err();

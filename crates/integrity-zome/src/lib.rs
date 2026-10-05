@@ -9,6 +9,7 @@ use zk_admission_protocol::{
 
 mod activity;
 mod crypto;
+mod native_groth16;
 mod sp1;
 
 #[dna_properties]
@@ -18,6 +19,8 @@ pub struct DnaPropertiesV1 {
     pub issuer_root_key: [u8; 32],
     pub issuer_root_key_id: [u8; 32],
     pub sp1_program_vkey_hash: [u8; 32],
+    pub nullifier_groth16_vk: Vec<u8>,
+    pub nullifier_groth16_vk_fingerprint: [u8; 32],
 }
 
 impl From<DnaPropertiesV1> for AdmissionConfigV1 {
@@ -28,6 +31,8 @@ impl From<DnaPropertiesV1> for AdmissionConfigV1 {
             issuer_root_key: properties.issuer_root_key,
             issuer_root_key_id: properties.issuer_root_key_id,
             sp1_program_vkey_hash: properties.sp1_program_vkey_hash,
+            nullifier_groth16_vk: properties.nullifier_groth16_vk,
+            nullifier_groth16_vk_fingerprint: properties.nullifier_groth16_vk_fingerprint,
         }
     }
 }
@@ -105,6 +110,11 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
     // Verify the SP1 Groth16 proof against the canonical statement and
     // the SP1 program authenticated by DNA properties.
     sp1::verify_sp1_groth16(&proof, &config)?;
+
+    // Verify the native nullifier proof against the statement's
+    // deployment/domain/nullifier and the verifying key pinned by DNA
+    // properties. This is in addition to, not instead of, SP1.
+    native_groth16::verify_native_nullifier_proof(&proof, &config)?;
 
     Ok(ValidateCallbackResult::Valid)
 }

@@ -16,6 +16,15 @@ pub struct AdmissionConfigV1 {
     /// This is the big-endian representation corresponding to
     /// `SP1VerifyingKey::bytes32_raw()`.
     pub sp1_program_vkey_hash: [u8; 32],
+
+    /// Canonical arkworks-compressed verifying key of the native nullifier
+    /// Groth16 circuit for this deployment.
+    pub nullifier_groth16_vk: Vec<u8>,
+
+    /// SHA-256 of `nullifier_groth16_vk`. Validation rejects the
+    /// configuration if the two disagree, and rejects proofs that name a
+    /// different key.
+    pub nullifier_groth16_vk_fingerprint: [u8; 32],
 }
 
 /// Signed delegation from the deployment admission root to an operational

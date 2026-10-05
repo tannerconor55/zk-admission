@@ -14,3 +14,4 @@ serde = { workspace = true }
 sp1-verifier = { version = "6.8.1", default-features = false }
 hex = "0.4.3"
 zk-admission-protocol = { path = "../protocol" }
+zk-admission-groth16-verifier = { path = "../groth16-verifier" }

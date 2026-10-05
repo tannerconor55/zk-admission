@@ -49,12 +49,18 @@ pub struct NullifierGroth16ProofV1 {
 /// The admission object is self-contained and carries the bounded
 /// source-chain sequence window used by integrity validation.
 ///
-/// The Groth16 proof bytes are opaque at the protocol layer; the
-/// integrity-zome will later verify them against the pinned verifier
-/// artifacts and the canonical statement public inputs.
+/// Both proofs are mandatory and are verified against `statement`:
+///
+/// - `groth16_proof`: SP1 Groth16 proof whose public values are the
+///   canonical encoding of the full `statement`
+///   (`encoding::encode_statement`), for the DNA-pinned SP1 program.
+/// - `nullifier_proof`: native Groth16 proof of the credential-secret /
+///   nullifier relation over `statement.deployment_id`, `statement.domain`
+///   and `statement.nullifier`, for the DNA-pinned verifying key.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, SerializedBytes)]
 pub struct ZkProofEntryV1 {
     pub statement: ZkStatementV1,
     pub admission: AdmissionV1,
     pub groth16_proof: Vec<u8>,
+    pub nullifier_proof: NullifierGroth16ProofV1,
 }

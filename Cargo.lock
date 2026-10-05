@@ -6332,6 +6332,7 @@ dependencies = [
  "holochain_serialized_bytes",
  "serde",
  "sp1-verifier",
+ "zk-admission-groth16-verifier",
  "zk-admission-protocol",
 ]
 

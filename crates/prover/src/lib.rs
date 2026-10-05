@@ -71,18 +71,31 @@ pub fn prove(statement: ZkStatementV1, credential_secret: Vec<u8>) -> Result<Vec
     Ok(proof_bytes)
 }
 
-/// Construct the complete immutable Holochain proof entry after generating
-/// the SP1 Groth16 proof.
+/// Construct the complete immutable Holochain proof entry.
+///
+/// Generates both mandatory proofs for the same statement:
+///
+/// - the native nullifier Groth16 proof, from the deployment's persisted
+///   proving key (checked against its pinned verifying-key fingerprint when
+///   loaded); this is generated first because it is fast and fails early
+///   on a wrong secret or key;
+/// - the SP1 Groth16 proof of the full canonical statement.
+///
+/// The native circuit requires a 32-byte `credential_secret`.
 pub fn prove_entry(
     statement: ZkStatementV1,
     admission: zk_admission_protocol::AdmissionV1,
     credential_secret: Vec<u8>,
+    nullifier_proving_key: &groth16::api::NullifierProvingKeyV1,
 ) -> Result<ZkProofEntryV1, String> {
+    let nullifier_proof = nullifier_proving_key.prove_statement(&statement, &credential_secret)?;
+
     let groth16_proof = prove(statement.clone(), credential_secret)?;
 
     Ok(ZkProofEntryV1 {
         statement,
         admission,
         groth16_proof,
+        nullifier_proof,
     })
 }

@@ -180,8 +180,8 @@ pub fn create_action_from_op<'a>(op: &'a Op) -> Option<&'a Action> {
 mod tests {
     use super::*;
     use zk_admission_protocol::{
-        AdmissionCapabilityV1, AdmissionDelegationV1, AdmissionV1, ProverKeyV1, SignatureV1,
-        ZkStatementV1,
+        AdmissionCapabilityV1, AdmissionDelegationV1, AdmissionV1, NullifierGroth16ProofV1,
+        ProverKeyV1, SignatureV1, ZkStatementV1,
     };
 
     fn agent(byte: u8) -> AgentPubKey {
@@ -293,6 +293,10 @@ mod tests {
                 },
             },
             groth16_proof: vec![19u8; 32],
+            nullifier_proof: NullifierGroth16ProofV1 {
+                verifying_key_id: [20u8; 32],
+                proof: vec![21u8; 133],
+            },
         }
     }
 
