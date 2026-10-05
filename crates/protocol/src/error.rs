@@ -41,6 +41,18 @@ pub enum ProtocolError {
     #[error("SP1 Groth16 verification failed")]
     Sp1Groth16VerificationFailed,
 
+    #[error("invalid native nullifier Groth16 proof encoding")]
+    InvalidNullifierProof,
+
+    #[error("native nullifier verifying-key fingerprint mismatch")]
+    NullifierVerifyingKeyMismatch,
+
+    #[error("invalid pinned native nullifier verifying key")]
+    InvalidNullifierVerifyingKey,
+
+    #[error("native nullifier Groth16 verification failed")]
+    NullifierProofVerificationFailed,
+
     #[error("statement hash mismatch")]
     StatementHashMismatch,
 

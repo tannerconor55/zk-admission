@@ -26,4 +26,7 @@ pub use capability::{
 };
 pub use validation::{validate_admission_bindings, AdmissionContextV1};
 
-pub use proof::ZkProofEntryV1;
+pub use proof::{
+    NullifierGroth16ProofV1, ZkProofEntryV1, NULLIFIER_GROTH16_CIRCUIT_ID_V1,
+    NULLIFIER_GROTH16_PROTOCOL_VERSION,
+};
