@@ -194,12 +194,16 @@ cargo run --release -p zk-admission-groth16-circuit \
     --bin nullifier_groth16_setup -- <output-dir>
 ```
 
-This writes `nullifier_groth16_pk.bin` (about 40.6 MB) and
-`nullifier_groth16_vk.bin` (456 bytes), and refuses to overwrite either.
-It prints the fingerprint and the two DNA-property values. Setup uses
-`OsRng` and never runs during proving. Record the fingerprint, put the
-VK and fingerprint in the DNA properties, and distribute the proving key
-to provers.
+The `<output-dir>` must not already exist; the tool creates it only
+after both key files have been generated and synchronized successfully.
+It writes `nullifier_groth16_pk.bin` (about 40.6 MB) and
+`nullifier_groth16_vk.bin` (456 bytes) into a temporary directory, syncs
+the files and directory, then atomically publishes the complete key pair.
+A failed setup cleans up the temporary directory and never publishes a
+partial key pair. It prints the fingerprint and the two DNA-property
+values. Setup uses `OsRng` and never runs during proving. Record the
+fingerprint, put the VK and fingerprint in the DNA properties, and
+distribute the proving key to provers.
 
 ### Proving
 
@@ -269,6 +273,70 @@ produce cheating proofs and show they are rejected.
   undermine zero-knowledge for the prover, even when its embedded VK
   matches the pin.
 - All randomness for setup and proving comes from `OsRng`.
+
+## Hardening and security review
+
+The native Groth16 path is deliberately hardened at several independent
+boundaries:
+
+- **Canonical proof encoding:** native proofs use an exact 133-byte
+  `ZKGP`/versioned wire format. Decoding requires valid compressed BN254
+  points and byte-for-byte canonical re-encoding, so truncation, trailing
+  data, alternate encodings and malformed points are rejected.
+- **Canonical verifying-key encoding:** the pinned verifying key is
+  decoded and re-encoded canonically before it is accepted.
+- **Cryptographic VK pinning:** the DNA contains the canonical verifying
+  key and its SHA-256 fingerprint. Validation recomputes the fingerprint,
+  verifies the key structure and public-input count, and requires the
+  proof's `verifying_key_id` to equal the pinned fingerprint.
+- **Statement-derived public inputs:** the native verifier derives
+  `(deployment_id, domain, nullifier)` directly from the entry's
+  `ZkStatementV1`. The proof does not carry a second copy of these values.
+- **Protocol-version pinning:** version 1 is both a circuit constant and
+  an explicit verifier check. A new protocol version requires a new
+  circuit setup and pinned key.
+- **Proving-key provenance:** the production proving API verifies that
+  the verifying key embedded in the proving key matches the deployment's
+  pinned fingerprint before proving.
+- **Self-verification:** newly generated native proofs are verified
+  against the pinned key before the prover returns them.
+- **Independent negative tests:** the circuit and integrity-zome tests
+  use real Groth16 proofs to exercise changed public inputs, every bit of
+  the public inputs, corrupted proof bytes, wrong keys, wrong fingerprints,
+  wrong proof key IDs, alternate setups and reissued capabilities.
+- **SP1 remains mandatory:** the native circuit intentionally does not
+  bind the complete statement. The SP1 proof therefore remains the
+  cryptographic binding for `prover`, `statement_nonce`, `program_id` and
+  the other canonical statement fields. The binding tests include attacks
+  that native Groth16 plus admission bindings alone would accept.
+- **Setup isolation:** native setup is a deployment-authority operation,
+  never part of normal proving. Generated key material is published only
+  after both files have been written and synchronized successfully, so a
+  failed setup cannot leave a partially published key pair that looks
+  complete.
+- **Randomness:** setup and proving use `OsRng`; no deterministic or
+  hard-coded randomness is used for production key generation or proofs.
+
+The hardening does **not** claim that the protocol is complete. In
+particular, two security properties remain explicit follow-up work:
+
+1. **DHT-wide nullifier uniqueness:** validation currently does not provide
+   a global uniqueness guarantee for a nullifier across the DHT. A future
+   design must define the uniqueness authority and race/replay semantics;
+   proof bytes and entry hashes are unsuitable uniqueness keys because
+   Groth16 proofs may be re-randomized.
+2. **Issuer authentication:** the current validation/SP1 path does not
+   cryptographically establish that the credential secret was issued by
+   the configured issuer. `issuer_root_key`, `issuer_id` and
+   `issuer_key_id` are currently carried as protocol data but are not
+   independently authenticated by the proof relation. This must be
+   addressed before treating issuer provenance as a security invariant.
+
+The native Groth16 trusted-setup assumption also remains: a party retaining
+the circuit-specific setup trapdoor could forge native proofs for that
+verifying key. The current design accepts this assumption because SP1 is
+still mandatory; a multi-party ceremony would remove the native setup
+trapdoor assumption.
 
 ## Known limitations
 
