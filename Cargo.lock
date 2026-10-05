@@ -6294,10 +6294,12 @@ name = "zk-admission-groth16-verifier"
 version = "0.1.0"
 dependencies = [
  "ark-bn254",
+ "ark-ec",
  "ark-groth16",
  "ark-relations",
  "ark-serialize",
  "ark-snark",
+ "sha2",
 ]
 
 [[package]]

@@ -9,7 +9,13 @@ path = "src/lib.rs"
 
 [dependencies]
 ark-bn254 = "0.5.0"
-ark-groth16 = "0.5.0"
+# No default features: the verifier must not pull rayon/std-parallel
+# machinery into the wasm32 integrity zome.
+ark-groth16 = { version = "0.5.0", default-features = false }
 ark-serialize = "0.5.0"
 ark-relations = "0.5.1"
 ark-snark = "0.5.1"
+sha2 = { workspace = true }
+
+[dev-dependencies]
+ark-ec = "0.5.0"
