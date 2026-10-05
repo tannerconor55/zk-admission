@@ -6302,6 +6302,7 @@ dependencies = [
  "ark-serialize",
  "ark-snark",
  "ark-std",
+ "hex",
  "holochain_serialized_bytes",
  "zk-admission-groth16-verifier",
  "zk-admission-protocol",

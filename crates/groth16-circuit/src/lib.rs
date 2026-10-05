@@ -18,6 +18,7 @@
 //! the proving path.
 
 pub mod nullifier;
+pub mod proving;
 
 use ark_bn254::Bn254;
 use ark_groth16::{Groth16, ProvingKey};
@@ -28,6 +29,7 @@ use zk_admission_groth16_verifier as verifier;
 use zk_admission_protocol::hashes::nullifier;
 
 pub use nullifier::NullifierCircuit;
+pub use proving::{generate_key_material, NullifierKeyMaterialV1, NullifierProvingKeyV1};
 pub use verifier::{Groth16Proof, Groth16VerifyingKey, NullifierPublicInputs};
 
 pub type Groth16ProvingKey = ProvingKey<Bn254>;
